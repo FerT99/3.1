@@ -1,8 +1,8 @@
 // =================================================================
 //
 // File: bst.h
-// Author:
-// Date:
+// Author: Fernanda Torres
+// Date: 27/10/2022
 //
 // =================================================================
 #ifndef BST_H
@@ -150,7 +150,7 @@ Node<T>* Node<T>::succesor() {
 }
 
 // =================================================================
-// Remove an elemento, putting a suc node in its place.
+// Remove an element, putting a suc node in its place.
 //
 // param @val, the element to be removed.
 // =================================================================
@@ -268,7 +268,21 @@ void Node<T>::preOrder(std::stringstream &aux) const {
 template <class T>
 uint Node<T>::leaves() const {
 	//TO DO
-	return 0;
+	uint cont = 0; //inicializar contador de hojas
+
+	if (left != nullptr) {
+		cont += left->leaves();
+	}
+
+	if (right != nullptr) {
+		cont += right->leaves();
+	}
+
+	if (left == nullptr && right == nullptr) {
+		cont++;
+	}
+
+	return cont;
 }
 
 // =================================================================
@@ -281,7 +295,23 @@ uint Node<T>::leaves() const {
 template <class T>
 uint Node<T>::depth() const {
 	//TO DO
-	return 0;
+	uint left = 0;
+	uint right = 0;
+
+	if (left != nullptr) {
+		left = left->depth();
+	}
+
+	if (right != nullptr) {
+		right = right->depth();
+	}
+
+	if (left > right) {
+		return left + 1;
+	} else {
+		return right + 1;
+	} 
+	//return left, right;
 }
 
 // =================================================================
@@ -293,7 +323,16 @@ uint Node<T>::depth() const {
 // =================================================================
 template <class T>
 bool Node<T>::isFull() const {
-	//TO DO
+	//TO DO 
+	if (left == nullptr && right == nullptr) {
+		return true;
+	}
+
+	if (left != nullptr && right != nullptr) {
+		if (left->depth() == right->depth()) {
+			return left->isFull() && right->isFull();
+		}
+	}
 	return false;
 }
 
@@ -307,7 +346,24 @@ bool Node<T>::isFull() const {
 template <class T>
 T Node<T>::ancestor(T val) const {
 	//TO DO
-	return T();
+	if (val < value) {
+		if (left != nullptr) {
+			if (left->value == val) {
+				return value;
+			} else {
+				return left->ancestor(val);
+			}
+		}
+	} else if (val > value) {
+		if (right != nullptr) {
+			if (right->value == val) {
+				return value;
+			} else {
+				return right->ancestor(val);
+			}
+		}
+	} //else {
+	throw NoSuchElement(); 
 }
 
 // =================================================================
@@ -332,8 +388,9 @@ public:
 	std::string inOrder() const;
 	std::string postOrder() const;
 	std::string preOrder() const;
-
 	std::string byLevel() const;
+
+	void getlevel(Node<T> *, int, std::stringstream &) const;
 	uint leaves() const;
 	bool isFull() const;
 	T ancestor(T) const;
@@ -490,10 +547,34 @@ std::string BST<T>::byLevel() const {
 
 	aux << "[";
 	if (!empty()) {
-		// TO DO
+		//TO DO
+		for (int i = 0; i <= root->depth(); i++) {
+			getlevel(root, i, aux);
+		}
 	}
 	aux << "]";
 	return aux.str();
+}
+
+// =================================================================
+// Get levels of the tree.
+//
+// @param node, the node to be traversed.
+// @param level, the level of the node.
+// @param aux, the string stream to be filled.
+// =================================================================
+template <class T>
+void BST<T>::getlevel(Node<T> *root, int level, std::stringstream &aux) const {
+	if (root == nullptr) {	
+		return;
+	}
+	else if (level == 0){
+		aux << root->value << " ";
+	}
+	else{
+		getlevel(root->left, level - 1, aux);
+		getlevel(root->right, level - 1, aux);
+	}
 }
 
 // =================================================================
